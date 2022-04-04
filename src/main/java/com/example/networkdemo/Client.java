@@ -56,6 +56,9 @@ public class Client extends Application {
                 toServer.writeUTF(message);
                 toServer.flush();
 
+                // Clear text field area
+                tf.setText("");
+
                 // Get message from the server
                 message = fromServer.readUTF();
 
