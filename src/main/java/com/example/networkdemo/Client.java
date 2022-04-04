@@ -24,7 +24,7 @@ public class Client extends Application {
         BorderPane paneForTextField = new BorderPane();
         paneForTextField.setPadding(new Insets(5, 5, 5, 5));
         paneForTextField.setStyle("-fx-border-color: green");
-        paneForTextField.setLeft(new Label("Enter a radius: "));
+        paneForTextField.setLeft(new Label("Enter a message: "));
 
         TextField tf = new TextField();
         tf.setAlignment(Pos.BOTTOM_RIGHT);
@@ -45,19 +45,20 @@ public class Client extends Application {
         tf.setOnAction(e -> {
             try {
                 // Get the radius from the text field
-                double radius = Double.parseDouble(tf.getText().trim());
+                String message = tf.getText().trim();
 
-                // Send the radius to the server
-                toServer.writeDouble(radius);
+                System.out.println(message);
+
+                // Send the message to the server
+                toServer.writeUTF(message);
                 toServer.flush();
 
-                // Get area from the server
-                double area = fromServer.readDouble();
+                // Get message from the server
+                message = fromServer.readUTF();
 
                 // Display to the text area
-                ta.appendText("Jared: Radius is " + radius + "\n");
-                ta.appendText("Area received from the server is "
-                        + area + '\n');
+                ta.appendText(message + "\n");
+
             }
             catch (IOException ex) {
                 System.err.println(ex);
