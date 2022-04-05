@@ -45,32 +45,6 @@ public class Client extends Application {
         primaryStage.setScene(scene); // Place the scene in the stage
         primaryStage.show(); // Display the stage
 
-        sendButton.setOnAction(e -> {
-            try {
-                // Get the radius from the text field
-                String message = tf.getText().trim();
-
-                System.out.println(message);
-
-                // Send the message to the server
-                toServer.writeUTF(message);
-                toServer.flush();
-
-                // Clear text field area
-                tf.setText("");
-
-                // Get message from the server
-                message = fromServer.readUTF();
-
-                // Display to the text area
-                ta.appendText(message + "\n");
-
-            }
-            catch (IOException ex) {
-                System.err.println(ex);
-            }
-        });
-
         try {
             // Create a socket to connect to the server
             Socket socket = new Socket("localhost", 8000);
@@ -82,10 +56,52 @@ public class Client extends Application {
 
             // Create an output stream to send data to the server
             toServer = new DataOutputStream(socket.getOutputStream());
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ta.appendText(ex.toString() + '\n');
         }
+
+        sendButton.setOnAction(e -> {
+            try {
+                // Get the radius from the text field
+                String message = tf.getText().trim();
+
+                System.out.println(message);
+
+                // Send the message to the server
+                toServer.writeUTF(message);
+                toServer.flush();
+                tf.setText("");
+
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+        });
+
+        new Thread( () -> {
+
+                while (true) {
+                    try {
+                        // read the message sent to this client
+                        String msg = fromServer.readUTF();
+                        //System.out.println("new mes: " + msg);
+
+                        // Display to the text area
+                        ta.appendText(msg + "\n");
+
+//                        Thread.sleep(100);
+
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+//                    catch ( InterruptedException intr){
+//                        System.out.println("inter");
+//                    }
+
+                }
+        }).start();
+
+
     }
 
     /**
