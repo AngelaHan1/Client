@@ -45,6 +45,7 @@ public class Client extends Application {
         primaryStage.setScene(scene); // Place the scene in the stage
         primaryStage.show(); // Display the stage
 
+
         try {
             // Create a socket to connect to the server
             Socket socket = new Socket("localhost", 8000);
@@ -90,9 +91,11 @@ public class Client extends Application {
 
 //                        Thread.sleep(100);
 
-                    } catch (IOException e) {
-
-                        e.printStackTrace();
+                    } catch (IOException e)
+                    {
+                        //e.printStackTrace();
+                        System.out.println("Server disconnected");
+                        break;
                     }
 //                    catch ( InterruptedException intr){
 //                        System.out.println("inter");
@@ -100,7 +103,6 @@ public class Client extends Application {
 
                 }
         }).start();
-
 
     }
 
