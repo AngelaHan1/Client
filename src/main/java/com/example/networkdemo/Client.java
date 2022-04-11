@@ -6,10 +6,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -20,11 +17,17 @@ public class Client extends Application {
 
     @Override // Override the start method in the Application class
     public void start(Stage primaryStage) {
+
+        // Button to send message.
+        Button sendButton = new Button("send");
+        sendButton.setDefaultButton(true);
+
         // Panel p to hold the label and text field
         BorderPane paneForTextField = new BorderPane();
         paneForTextField.setPadding(new Insets(5, 5, 5, 5));
         paneForTextField.setStyle("-fx-border-color: green");
-        paneForTextField.setLeft(new Label("Enter a message: "));
+        paneForTextField.setLeft(new Label("Enter message: "));
+        paneForTextField.setRight(sendButton);
 
         TextField tf = new TextField();
         tf.setAlignment(Pos.BOTTOM_RIGHT);
@@ -34,36 +37,13 @@ public class Client extends Application {
         // Text area to display contents
         TextArea ta = new TextArea();
         mainPane.setCenter(new ScrollPane(ta));
-        mainPane.setTop(paneForTextField);
+        mainPane.setBottom(paneForTextField);
 
         // Create a scene and place it in the stage
         Scene scene = new Scene(mainPane, 450, 200);
         primaryStage.setTitle("Client"); // Set the stage title
         primaryStage.setScene(scene); // Place the scene in the stage
         primaryStage.show(); // Display the stage
-
-        tf.setOnAction(e -> {
-            try {
-                // Get the radius from the text field
-                String message = tf.getText().trim();
-
-                System.out.println(message);
-
-                // Send the message to the server
-                toServer.writeUTF(message);
-                toServer.flush();
-
-                // Get message from the server
-                message = fromServer.readUTF();
-
-                // Display to the text area
-                ta.appendText(message + "\n");
-
-            }
-            catch (IOException ex) {
-                System.err.println(ex);
-            }
-        });
 
         try {
             // Create a socket to connect to the server
@@ -76,10 +56,52 @@ public class Client extends Application {
 
             // Create an output stream to send data to the server
             toServer = new DataOutputStream(socket.getOutputStream());
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ta.appendText(ex.toString() + '\n');
         }
+
+        sendButton.setOnAction(e -> {
+            try {
+                // Get the radius from the text field
+                String message = tf.getText().trim();
+
+                System.out.println(message);
+
+                // Send the message to the server
+                toServer.writeUTF(message);
+                toServer.flush();
+                tf.setText("");
+
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
+        });
+
+        new Thread( () -> {
+
+                while (true) {
+                    try {
+                        // read the message sent to this client
+                        String msg = fromServer.readUTF();
+                        //System.out.println("new mes: " + msg);
+
+                        // Display to the text area
+                        ta.appendText(msg + "\n");
+
+//                        Thread.sleep(100);
+
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+//                    catch ( InterruptedException intr){
+//                        System.out.println("inter");
+//                    }
+
+                }
+        }).start();
+
+
     }
 
     /**
