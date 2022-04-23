@@ -12,8 +12,11 @@ import javafx.stage.Stage;
 
 public class Client extends Application {
     // IO streams
-    DataOutputStream toServer = null;
-    DataInputStream fromServer = null;
+//    DataOutputStream toServer = null;
+//    DataInputStream fromServer = null;
+    ObjectOutputStream toServer = null;
+    ObjectInputStream fromServer = null;
+
 
     @Override // Override the start method in the Application class
     public void start(Stage primaryStage) {
@@ -51,26 +54,31 @@ public class Client extends Application {
             // Socket socket = new Socket("130.254.204.36", 8000);
             // Socket socket = new Socket("drake.Armstrong.edu", 8000);
 
-            // Create an input stream to receive data from the server
-            fromServer = new DataInputStream(socket.getInputStream());
-
             // Create an output stream to send data to the server
-            toServer = new DataOutputStream(socket.getOutputStream());
+            toServer = new ObjectOutputStream(socket.getOutputStream());
+
+            // Create an input stream to receive data from the server
+            fromServer = new ObjectInputStream(socket.getInputStream());
+
         } catch (IOException ex) {
             ta.appendText(ex.toString() + '\n');
         }
 
         sendButton.setOnAction(e -> {
             try {
-                // Get the radius from the text field
-                String message = tf.getText().trim();
+                // Get the message from the text field
+//                String message = tf.getText().trim();
 
-                System.out.println(message);
+                //Typess type = HumanTypes.CREATE_GAME;
+                Object message = new Message("single", HumanTypes.CREATE_GAME);
 
+                // Downcast message from Object
+                Message msg = (Message)message;
+                System.out.println("sending: " + msg.getType().getDescription());
+
+                //Object msg = message;
                 // Send the message to the server
-                toServer.writeUTF(message);
-                toServer.flush();
-                tf.setText("");
+                toServer.writeObject(message);
 
             } catch (IOException ex) {
                 System.err.println(ex);
@@ -82,11 +90,13 @@ public class Client extends Application {
                 while (true) {
                     try {
                         // read the message sent to this client
-                        String msg = fromServer.readUTF();
-                        //System.out.println("new mes: " + msg);
+                        Object msg = fromServer.readObject();
+
+                        // Downcast message from Object
+                        Message mess = (Message)msg;
 
                         // Display to the text area
-                        ta.appendText(msg + "\n");
+                        ta.appendText(mess.getType().getDescription() + "\n");
 
 //                        Thread.sleep(100);
 
@@ -94,10 +104,9 @@ public class Client extends Application {
 
                         e.printStackTrace();
                     }
-//                    catch ( InterruptedException intr){
-//                        System.out.println("inter");
-//                    }
-
+                    catch (ClassNotFoundException ex){
+                        ex.printStackTrace();
+                    }
                 }
         }).start();
 
