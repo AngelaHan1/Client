@@ -3,6 +3,7 @@ package com.example.networkdemo;
 import java.io.*;
 import java.net.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -70,8 +71,18 @@ public class Client extends Application {
 //                String message = tf.getText().trim();
 
                 //Typess type = HumanTypes.CREATE_GAME;
+
+                //Typess type = HumanTypes.CREATE_GAME;
                 Object message = new Message("single", HumanTypes.CREATE_GAME);
 
+
+                // uncomment this block to send the MAKE_MOVE message for testing
+                //********************************
+                //Move move = new Move(0,2,'X', "room1");
+                //Object message = new Message(move, HumanTypes.MAKE_MOVE);
+                //********************************
+
+                
                 // Downcast message from Object
                 Message msg = (Message)message;
                 System.out.println("sending: " + msg.getType().getDescription());
@@ -79,6 +90,7 @@ public class Client extends Application {
                 //Object msg = message;
                 // Send the message to the server
                 toServer.writeObject(message);
+
 
             } catch (IOException ex) {
                 System.err.println(ex);
@@ -95,14 +107,14 @@ public class Client extends Application {
                         // Downcast message from Object
                         Message mess = (Message)msg;
 
-                        // Display to the text area
-                        ta.appendText(mess.getType().getDescription() + "\n");
-
-//                        Thread.sleep(100);
+                        Platform.runLater( () -> {
+                            // Display to the text area
+                            ta.appendText(mess.getType().getDescription() + "\n");
+                        });
 
                     } catch (IOException e) {
-
                         e.printStackTrace();
+                        break;
                     }
                     catch (ClassNotFoundException ex){
                         ex.printStackTrace();
