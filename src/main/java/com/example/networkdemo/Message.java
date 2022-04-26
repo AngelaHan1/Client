@@ -8,7 +8,8 @@ public class Message implements Serializable {
 
     private Object data;
     private Typess type;
-//    private String description;   // is part of Types
+//    private id  source;      // Sender of message
+//    private int destination; // Channel its intended for
 
     public Message(Object data, Typess type){
 

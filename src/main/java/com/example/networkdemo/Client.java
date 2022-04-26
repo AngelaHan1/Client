@@ -49,6 +49,8 @@ public class Client extends Application {
         primaryStage.setScene(scene); // Place the scene in the stage
         primaryStage.show(); // Display the stage
 
+        //assign ID
+
         try {
             // Create a socket to connect to the server
             Socket socket = new Socket("localhost", 8000);
@@ -68,18 +70,25 @@ public class Client extends Application {
         sendButton.setOnAction(e -> {
             try {
                 // Get the message from the text field
-//                String message = tf.getText().trim();
+                String values = tf.getText().trim();
+
+
+                int x = Integer.valueOf(values.charAt(0));
+                int y = Integer.valueOf(values.charAt(1));
+                x = x % 48;
+                y = y % 48;
 
                 //Typess type = HumanTypes.CREATE_GAME;
 
                 //Typess type = HumanTypes.CREATE_GAME;
-                Object message = new Message("single", HumanTypes.CREATE_GAME);
+                //Object message = new Message("single", HumanTypes.CREATE_GAME);
 
+                System.out.println("x: " + x +" & y: " + y);
 
                 // uncomment this block to send the MAKE_MOVE message for testing
                 //********************************
-                //Move move = new Move(0,2,'X', "room1");
-                //Object message = new Message(move, HumanTypes.MAKE_MOVE);
+                Move move = new Move(x,y,'X');
+                Object message = new Message(move, HumanTypes.MAKE_MOVE);
                 //********************************
 
                 
